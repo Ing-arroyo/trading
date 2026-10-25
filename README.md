@@ -19,6 +19,10 @@ Los indicadores fijos son tendencia de 5m, tendencia de 1m, VWAP, RSI, ATR y vol
 
 El universo son 10 pares USDT. Bitcoin va siempre primero. Si Bitcoin no se puede leer, el análisis se detiene. En risk-off no hay largos.
 
+## Streamlit
+
+El archivo principal del despliegue es `app.py`, en la raíz del repositorio. Streamlit Cloud también usa el `requirements.txt` de esa misma raíz.
+
 ## Arranque
 
 Desde esta carpeta:
