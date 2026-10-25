@@ -103,3 +103,26 @@ def test_binance_adapter_parses_public_payloads() -> None:
                 await market.depth("bad symbol", 100)
 
     asyncio.run(run())
+
+
+def test_binance_uses_the_public_mirror_when_the_region_is_blocked() -> None:
+    seen: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request.url.host)
+        if request.url.host == "data-api.binance.vision":
+            return httpx.Response(451, json={"code": 0, "msg": "restricted"})
+        return httpx.Response(
+            200,
+            json=[{"symbol": "BTCUSDT", "quoteVolume": "10", "lastPrice": "1"}],
+        )
+
+    async def run() -> None:
+        transport = httpx.MockTransport(handler)
+        async with httpx.AsyncClient(transport=transport) as client:
+            market = BinancePublicMarket(client)
+            tickers = await market.tickers("USDT")
+            assert tickers[0].symbol == "BTCUSDT"
+            assert seen == ["data-api.binance.vision", "api.binance.com"]
+
+    asyncio.run(run())

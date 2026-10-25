@@ -14,14 +14,21 @@ from ancla.ports import ScanError
 _SYMBOL = re.compile(r"^[A-Z0-9]{5,20}$")
 _INTERVALS = {"1m", "5m"}
 _DEPTHS = {5, 10, 20, 50, 100, 500, 1000, 5000}
+# El dominio principal bloquea con 451 a los servidores de algunas regiones.
+# El de datos públicos responde el mismo libro y las mismas velas.
+_PUBLIC_HOSTS = (
+    "https://data-api.binance.vision",
+    "https://api.binance.com",
+)
 
 
 class BinancePublicMarket:
     name = "binance"
 
-    def __init__(self, client: httpx.AsyncClient, base_url: str = "https://api.binance.com") -> None:
+    def __init__(self, client: httpx.AsyncClient, base_url: str | None = None) -> None:
         self._client = client
-        self._base_url = base_url.rstrip("/")
+        self._hosts = (base_url.rstrip("/"),) if base_url else _PUBLIC_HOSTS
+        self._host_index = 0
         self._lock = asyncio.Lock()
         self._last_call = 0.0
 
@@ -75,7 +82,7 @@ class BinancePublicMarket:
                 if wait > 0:
                     await asyncio.sleep(wait)
                 try:
-                    response = await self._client.get(f"{self._base_url}{path}", params=params)
+                    response = await self._client.get(f"{self._host()}{path}", params=params)
                 except httpx.HTTPError as exc:
                     last_error = "No hay conexión con Binance."
                     self._last_call = time.monotonic()
@@ -88,10 +95,18 @@ class BinancePublicMarket:
                 await asyncio.sleep(0.4 * (attempt + 1))
                 continue
             assert response is not None
+            if response.status_code == 451 and self._host_index + 1 < len(self._hosts):
+                self._host_index += 1
+                continue
             if response.status_code in {418, 429, 500, 503}:
                 last_error = "Binance está limitando las consultas. Espera unos segundos."
                 await asyncio.sleep(0.4 * (attempt + 1))
                 continue
+            if response.status_code == 451:
+                raise ScanError(
+                    "Binance bloqueó la consulta por la región del servidor. "
+                    "Tampoco respondió el espejo de datos públicos."
+                )
             if response.status_code >= 400:
                 raise ScanError(f"Binance rechazó la consulta ({response.status_code}).")
             try:
@@ -99,6 +114,9 @@ class BinancePublicMarket:
             except ValueError as exc:
                 raise ScanError("Binance devolvió una respuesta que no es JSON.") from exc
         raise ScanError(last_error)
+
+    def _host(self) -> str:
+        return self._hosts[self._host_index]
 
 
 def _check_symbol(symbol: str) -> None:
