@@ -1,6 +1,6 @@
 # Ancla
 
-Buscador de entradas de scalping en spot. La estrategia principal lee el libro de órdenes, usa a Bitcoin como régimen y solo propone un largo cuando la ganancia pedida y la relación beneficio/riesgo caben delante del siguiente bloque de resistencia.
+Buscador de entradas de scalping en spot. La estrategia principal lee el libro de órdenes y solo propone un largo cuando la ganancia pedida y la relación beneficio/riesgo caben delante del siguiente bloque de resistencia. Bitcoin se muestra como contexto y no veta al candidato.
 
 Esta versión no envía órdenes ni abre Telegram. Esos dos caminos existen como contrato y responden con un rechazo.
 
@@ -17,7 +17,7 @@ Con la configuración inicial la ganancia mínima es **1%** y la relación míni
 
 Los indicadores fijos son tendencia de 5m, tendencia de 1m, VWAP, RSI, ATR y volumen. Un indicador propio se suma como filtro: si falla, veta la entrada. No puede autorizarla por su cuenta. El máximo absoluto es 5 y el límite activo sale de la configuración.
 
-El universo son 10 pares USDT. Bitcoin va siempre primero. Si Bitcoin no se puede leer, el análisis se detiene. En risk-off no hay largos.
+El universo son 10 pares USDT. Bitcoin va siempre primero y su régimen de 5m aparece en el resultado. Si Bitcoin no se puede leer, el análisis se detiene, porque ese contexto forma parte del informe. Un Bitcoin en contra baja el puntaje de contexto y no anula una entrada que ya cumple el libro, la salida y los indicadores.
 
 ## Streamlit
 

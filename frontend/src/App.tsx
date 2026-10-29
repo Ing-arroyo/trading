@@ -108,8 +108,8 @@ export function App() {
         >
           <h2>Estrategia principal</h2>
           <p className="lede">
-            Bitcoin marca el régimen. El libro marca soporte, stop y si el objetivo cabe.
-            Los indicadores propios solo pueden vetar.
+            El libro marca soporte, stop y si el objetivo cabe. Bitcoin se muestra aparte
+            y no veta. Los indicadores propios solo pueden vetar.
           </p>
           <label>
             Ganancia mínima (%)

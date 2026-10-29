@@ -1,4 +1,4 @@
-"""Régimen de Bitcoin. El resto del universo opera a favor de este filtro."""
+"""Régimen de Bitcoin. Se muestra en cada análisis y no veta candidatos."""
 
 from __future__ import annotations
 
@@ -34,7 +34,7 @@ def assess_btc(candles: list[Candle]) -> BtcRegime:
         cause = "Bitcoin cae con las medias en contra." if bearish_stack else "Bitcoin acaba de ceder con fuerza."
         return BtcRegime(
             name="risk_off",
-            detail=f"{cause} No hay largos.",
+            detail=f"{cause} Es contexto: no impide una entrada que cumpla el resto.",
             return_pct=return_pct,
             close=close,
             ema_fast=fast,
@@ -51,7 +51,7 @@ def assess_btc(candles: list[Candle]) -> BtcRegime:
         )
     return BtcRegime(
         name="neutral",
-        detail="Bitcoin no confirma tendencia. Los largos exigen el resto de la confluencia.",
+        detail="Bitcoin no confirma tendencia. La entrada depende del libro y del resto de indicadores.",
         return_pct=return_pct,
         close=close,
         ema_fast=fast,

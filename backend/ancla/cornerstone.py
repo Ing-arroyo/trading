@@ -1,8 +1,8 @@
 """Constantes de la estrategia principal.
 
 Estos valores no salen de la configuración del usuario. Un indicador propio
-puede vetar una entrada; no puede aflojar el libro, el régimen de Bitcoin
-ni el techo de riesgo.
+puede vetar una entrada; no puede aflojar el libro ni el techo de riesgo.
+El régimen de Bitcoin se informa y no autoriza ni anula la entrada.
 """
 
 UNIVERSE_SIZE = 10

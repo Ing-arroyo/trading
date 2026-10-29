@@ -42,12 +42,15 @@ def test_without_a_bid_wall_indicators_cannot_open_a_trade() -> None:
     assert "no_support" in {reason.code for reason in decision.reasons}
 
 
-def test_bitcoin_risk_off_blocks_a_perfect_book() -> None:
+def test_bitcoin_risk_off_stays_visible_and_does_not_block() -> None:
     regime = assess_btc(make_candles(64_000, direction="down"))
     assert regime.name == "risk_off"
     decision = _evaluate(regime=regime)
-    assert not decision.accepted
-    assert "btc_regime" in {reason.code for reason in decision.reasons}
+    assert decision.accepted, [reason.message for reason in decision.reasons]
+    assert "btc_regime" not in {reason.code for reason in decision.reasons}
+    bitcoin = next(reading for reading in decision.readings if reading.name == "Bitcoin")
+    assert bitcoin.passed is False
+    assert "contexto" in bitcoin.detail.lower()
 
 
 def test_custom_indicator_can_veto_and_cannot_replace_the_book() -> None:

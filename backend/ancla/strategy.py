@@ -48,7 +48,6 @@ _MESSAGES = {
     "spread": "El spread es demasiado ancho para un scalp.",
     "no_support": "No hay un bloque de soporte a distancia de entrada.",
     "imbalance": "El libro cercano no acompaña al comprador.",
-    "btc_regime": "Bitcoin está en risk-off. La estrategia no abre largos.",
     "trend_5m": "La tendencia de 5m no acompaña el largo.",
     "trend_1m": "La tendencia de 1m no acompaña el largo.",
     "vwap": "El precio está debajo del VWAP.",
@@ -134,16 +133,13 @@ def evaluate(
     if not imbalance_ok:
         reasons.append(_reason("imbalance"))
 
-    regime_ok = regime.name in {"bullish", "neutral"}
     readings.append(
         IndicatorReading(
             name="Bitcoin",
-            passed=regime_ok,
+            passed=regime.name == "bullish",
             detail=regime.detail,
         )
     )
-    if not regime_ok:
-        reasons.append(_reason("btc_regime"))
 
     close_1m = closes(candles_1m)
     close_5m = closes(candles_5m)
